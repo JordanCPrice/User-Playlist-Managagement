@@ -39,7 +39,7 @@ public class UserDAO implements UserDAOInterface {
 
         }catch (SQLException e){
             e.printStackTrace();
-            System.out.println("Error, Id not found");
+            System.out.println("Error, ID not found");
         }
 
         return null;
@@ -76,7 +76,10 @@ public class UserDAO implements UserDAOInterface {
     }
 
     @Override
-    public User updateUsername(User username, String newUserName) {
+    public User updateUsername(String username, String newUserName) {
+        UserDAO uDAO = new UserDAO();
+
+        User user = uDAO.findByUsername(username);
 
         try(Connection conn = ConnectionUtil.getConnection()){
 
@@ -88,13 +91,13 @@ public class UserDAO implements UserDAOInterface {
 
             // Populates the first ? with the parameter id
             ps.setString(1,newUserName);
-            ps.setString(2, username.getUsername());
+            ps.setString(2, user.getUsername());
 
             // Executes the query and saves the result in the ResultSet
             ps.executeUpdate();
 
-
-                return username;
+            System.out.println("Congratulations " + username + " you have successfully updated your username to " + newUserName + "!");
+            return user;
 
         }catch (SQLException e){
             e.printStackTrace();
@@ -131,5 +134,46 @@ public class UserDAO implements UserDAOInterface {
             System.out.println("Error retrieving all users");
         }
         return null;
+    }
+    public User addNewUser(User user){
+
+        try(Connection conn = ConnectionUtil.getConnection()){
+
+            String sql = "INSERT INTO users(username, full_name) VALUES(?,?)";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getFull_name());
+
+            ps.executeUpdate();
+
+            System.out.println("Welcome to our newest user " + user.getUsername() + "!");
+
+            return user;
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.out.println("Error when adding new user.");
+        }
+        return null;
+    }
+
+    public void deleteUser(User user){
+
+        try(Connection conn = ConnectionUtil.getConnection()){
+
+            String sql = "DELETE FROM users WHERE username = ?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1,user.getUsername());
+
+            ps.executeUpdate();
+            System.out.println(user.getUsername() + " was deleted successfully");
+
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.out.println("Error when deleting user");
+        }
     }
 }

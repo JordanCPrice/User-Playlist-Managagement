@@ -26,6 +26,8 @@ public class SongDao implements SongDAOInterface{
 
             ps.executeUpdate();
 
+            System.out.println(song.getTitle() + " was successfully added!");
+
             return song;
 
         }catch(SQLException e){
