@@ -1,12 +1,6 @@
 
 # User and Playlist Management Application
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Technologies Used](#technologies-used)
-- [API Endpoints](#api-endpoints)
-- [Features](#features)
 
 ## Introduction
 
