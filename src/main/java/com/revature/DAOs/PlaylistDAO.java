@@ -125,6 +125,4 @@ public class PlaylistDAO implements PlaylistDAOInterface{
 
         return playlistNames;
     }
-
-
 }
