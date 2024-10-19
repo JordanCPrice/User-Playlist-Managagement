@@ -76,36 +76,25 @@ public class UserDAO implements UserDAOInterface {
     }
 
     @Override
-    public User updateUsername(String username, String newUserName) {
-        UserDAO uDAO = new UserDAO();
-
-        User user = uDAO.findByUsername(username);
-
-        try(Connection conn = ConnectionUtil.getConnection()){
-
-            //Represents the SQL query
-            String sql = "UPDATE users SET username = ? WHERE username = ?";
-
-            // PreparedStatement helps sanitize data to prevent SQL injection
+    public boolean updateUsername(int userId, String newUsername) {
+        try (Connection conn = ConnectionUtil.getConnection()) {
+            String sql = "UPDATE users SET username = ? WHERE user_id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            // Populates the first ? with the parameter id
-            ps.setString(1,newUserName);
-            ps.setString(2, user.getUsername());
+            ps.setString(1, newUsername);  // Set the new username
+            ps.setInt(2, userId);          // Use the userId directly
 
-            // Executes the query and saves the result in the ResultSet
-            ps.executeUpdate();
+            int rowsUpdated = ps.executeUpdate();
 
-            System.out.println("Congratulations " + username + " you have successfully updated your username to " + newUserName + "!");
-            return user;
+            // If at least one row was updated, return true
+            return rowsUpdated > 0;
 
-        }catch (SQLException e){
-            e.printStackTrace();
-            System.out.println("Error updating username");
+        } catch (SQLException e) {
+            e.printStackTrace();  // Log the exception
+            return false;         // Handle as needed
         }
-
-        return null;
     }
+
     public ArrayList<User> getAllUsers(){
 
         try(Connection conn = ConnectionUtil.getConnection()){
@@ -137,6 +126,13 @@ public class UserDAO implements UserDAOInterface {
     }
     public User addNewUser(User user){
 
+        UserDAO uDAO = new UserDAO();
+
+        if (uDAO.checkIfUsernameExist(user.getUsername())){
+            System.out.println("Username is already taken");
+            return null;
+        }
+
         try(Connection conn = ConnectionUtil.getConnection()){
 
             String sql = "INSERT INTO users(username, full_name) VALUES(?,?)";
@@ -158,22 +154,43 @@ public class UserDAO implements UserDAOInterface {
         return null;
     }
 
-    public void deleteUser(User user){
+    public void deleteUser(int user_id){
 
         try(Connection conn = ConnectionUtil.getConnection()){
 
-            String sql = "DELETE FROM users WHERE username = ?";
+            String sql = "DELETE FROM users WHERE user_id = ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1,user.getUsername());
+            ps.setInt(1,user_id);
 
             ps.executeUpdate();
-            System.out.println(user.getUsername() + " was deleted successfully");
+            System.out.println("User with ID " + user_id + " was deleted successfully");
 
         }catch(SQLException e){
             e.printStackTrace();
             System.out.println("Error when deleting user");
         }
+    }
+
+    public boolean checkIfUsernameExist(String username){
+
+        try(Connection conn = ConnectionUtil.getConnection()){
+
+            String sql = "SELECT * FROM users where username = ?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1,username);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                return rs.getInt(1) > 0; // Return true if count > 0 (username exists)
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -104,4 +104,27 @@ public class PlaylistDAO implements PlaylistDAOInterface{
         }
     }
 
+    public List<String> getPlaylistByUser(int user_id) {
+        List<String> playlistNames = new ArrayList<>();
+
+        String sql = "SELECT playlist_name FROM playlist WHERE user_id_fk = ?";
+
+        try (Connection conn = ConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, user_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                playlistNames.add(rs.getString("playlist_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return playlistNames;
+    }
+
+
 }

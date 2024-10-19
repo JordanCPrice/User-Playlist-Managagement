@@ -13,12 +13,14 @@ public interface UserDAOInterface {
     User getUserById(int id);
 
     // Allows user to update Username
-    User updateUsername(String username, String newUserName);
+    public boolean updateUsername(int userId, String newUsername);
 
     ArrayList<User> getAllUsers();
 
     User addNewUser(User user);
 
-    void deleteUser(User user);
+    void deleteUser(int user_id);
+
+    boolean checkIfUsernameExist(String username);
 
 }

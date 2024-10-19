@@ -3,10 +3,8 @@ package com.revature.DAOs;
 import com.revature.models.Song;
 import com.revature.utils.ConnectionUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
+import java.sql.*;
+import java.util.ArrayList;
 
 
 public class SongDao implements SongDAOInterface{
@@ -36,5 +34,37 @@ public class SongDao implements SongDAOInterface{
         }
 
         return null;
+    }
+
+    @Override
+    public ArrayList<Song> getAllSongs() {
+
+        try(Connection conn = ConnectionUtil.getConnection()){
+
+            String sql = "SELECT * FROM songs";
+
+            // We can use a statement since there are no variables
+            Statement statement = conn.createStatement();
+
+            ResultSet rs = statement.executeQuery(sql);
+
+            ArrayList<Song> songs = new ArrayList<>();
+
+            while (rs.next()){
+                Song s = new Song(
+                        rs.getInt("song_id"),
+                        rs.getString("title"),
+                        rs.getString("artist")
+                );
+
+                songs.add(s);
+            }
+            return songs;
+        }catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Error retrieving all users");
+        }
+        return null;
+
     }
 }

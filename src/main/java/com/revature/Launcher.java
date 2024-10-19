@@ -1,53 +1,42 @@
 package com.revature;
 
-import com.revature.DAOs.PlaylistDAO;
-import com.revature.DAOs.SongDao;
-import com.revature.DAOs.UserDAO;
-import com.revature.models.Playlist;
-import com.revature.models.Song;
-import com.revature.models.User;
-import com.revature.utils.ConnectionUtil;
+import com.revature.controllers.PlaylistController;
+import com.revature.controllers.SongController;
+import com.revature.controllers.UserController;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
+import io.javalin.Javalin;
 public class Launcher {
 
     public static void main(String[] args) {
 
-        try (Connection conn = ConnectionUtil.getConnection()) {
-            System.out.println("Conenction successful");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-//        UserDAO uDao = new UserDAO();
-//        User user = new User("choclolateecake", "George Washington");
-        //uDao.addNewUser(user);
-        //uDao.deleteUser(user);
-        //uDao.updateUsername("JXP", "JP");
+        // Javalin Set-up, instantiates Javalin object on port 7000
+        var app = Javalin.create().start(7000);
 
+        app.get("/", ctx -> ctx.result("Hello Javlin"));
 
-        //System.out.println(uDao.getAllUsers());
+        UserController uc = new UserController();
+        PlaylistController pc = new PlaylistController();
+        SongController sc = new SongController();
 
-        Song s = new Song("Bangarang", "Skrillex");
-        SongDao sDao = new SongDao();
-        sDao.addSong(s);
+        //app.get is the Javalin handler which takes in GET requests
+        // It is calling the getUserHandler method from the UserController class
+        // When we send a get request to localhost:7000/users it gets routed here.
 
-        PlaylistDAO pDAO = new PlaylistDAO();
-//        //System.out.println(pDAO.createNewPlaylist("NEW PLAYLIST", "JP"));
-        //List<Song> songs = pDAO.getUsersPlaylist(1, 1);
-        //for (Song song : songs) {
-            //System.out.println(song.toString());
-//        }
+        app.get("/users", uc.getUsersHandler);
 
+        //app.post is the Javalin handler for post requests
+        app.post("/users", uc.insertNewUserHandler);
 
-        //Playlist plist = new Playlist("awseomename", 1);
-            //pDAO.createNewPlaylist("awesomename", "JP");
+        app.patch("/users/{id}", uc.updateUsernameHandler);
 
-        //pDAO.deletePlaylist("awesomename");
+        app.delete("/users/{id}", uc.deleteUserHandler);
+
+        app.get("/songs", sc.getAllSongsHandler);
+
+        app.get("/users/{id}", pc.getPlayListByIDHandler);
+
+        app.post("/playlist", pc.addNewPlaylistHandler);
 
         }
     }
-
