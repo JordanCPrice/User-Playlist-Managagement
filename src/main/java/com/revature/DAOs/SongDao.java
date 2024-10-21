@@ -5,6 +5,7 @@ import com.revature.utils.ConnectionUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class SongDao implements SongDAOInterface{
@@ -66,5 +67,32 @@ public class SongDao implements SongDAOInterface{
         }
         return null;
 
+    }
+
+    public List<Song> getSongsByPlaylist(int playlist_id) {
+        List<Song> songs = new ArrayList<>();
+        String sql = "SELECT s.song_id, s.title, s.artist FROM songs s " +
+                "JOIN playlist_songs ps ON s.song_id = ps.song_id " +
+                "WHERE ps.playlist_id = ?";
+
+        try (Connection conn = ConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, playlist_id);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Song song = new Song();
+                song.setSong_id(rs.getInt("song_id"));
+                song.setTitle(rs.getString("title"));
+                song.setArtist(rs.getString("artist"));
+                songs.add(song);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return songs;
     }
 }

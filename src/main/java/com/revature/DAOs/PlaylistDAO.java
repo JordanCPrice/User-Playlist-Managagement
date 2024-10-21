@@ -86,17 +86,17 @@ public class PlaylistDAO implements PlaylistDAOInterface{
         return songs;
     }
 
-    public void deletePlaylist(String name){
+    public void deletePlaylist(int playlist_id){
         try(Connection conn = ConnectionUtil.getConnection()){
 
-            String sql = "DELETE FROM playlist WHERE playlist_name = ?";
+            String sql = "DELETE FROM playlist WHERE playlist_id = ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1,name);
+            ps.setInt(1,playlist_id);
 
             ps.executeUpdate();
-            System.out.println(name + " was deleted successfully");
+            System.out.println(playlist_id + " was deleted successfully");
 
         }catch(SQLException e){
             e.printStackTrace();
@@ -116,7 +116,7 @@ public class PlaylistDAO implements PlaylistDAOInterface{
 
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 playlistNames.add(rs.getString("playlist_name"));
             }
         } catch (SQLException e) {
@@ -124,5 +124,37 @@ public class PlaylistDAO implements PlaylistDAOInterface{
         }
 
         return playlistNames;
+    }
+
+    public Playlist getPlaylistById(int id) {
+
+        try(Connection conn = ConnectionUtil.getConnection()){
+
+            //Represents the SQL query
+            String sql = "SELECT * FROM playlist WHERE playlist_id = ?";
+
+            // PreparedStatement helps sanitize data to prevent SQL injection
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            // Populates the first ? with the parameter id
+            ps.setInt(1, id);
+
+            // Executes the query and saves the result in the ResultSet
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                Playlist pList = new Playlist(
+                        rs.getInt("playlist_id"),
+                        rs.getString("playlist_name"),
+                        rs.getInt("user_id_fk")
+                );
+                return pList;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Error, ID not found");
+        }
+
+        return null;
     }
 }

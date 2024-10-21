@@ -60,4 +60,27 @@ public class PlaylistController {
             ctx.result("Couldn't create playlist");
         }
     };
+
+    public Handler deletePlaylistHandler = ctx -> {
+
+        int playlist_id = Integer.parseInt(ctx.pathParam("id"));
+
+        if (playlist_id <= 0) {
+            ctx.result("ID must be greater than 0!");
+            ctx.status(400);
+            return;
+        }
+
+        Playlist pList = pDAO.getPlaylistById(playlist_id);
+        if (pList == null) {
+            ctx.result("Playlist with ID " + playlist_id + " does not exist.");
+            ctx.status(404); // Not found
+            return;
+        }
+
+        // Proceed with deleting the user
+        pDAO.deletePlaylist(playlist_id);
+        ctx.result("Playlist " + pList.getPlaylist_name() + " was deleted successfully.");
+        ctx.status(200); // OK
+    };
 }

@@ -11,9 +11,11 @@ public interface PlaylistDAOInterface {
 
     List<Song> getUsersPlaylist(int user_id, int playlist_id);
 
-    void deletePlaylist(String name);
+    void deletePlaylist(int playlist_id);
 
     List<String>getPlaylistByUser(int user_id);
+
+    Playlist getPlaylistById(int id);
 }
 
 

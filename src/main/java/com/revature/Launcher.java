@@ -58,7 +58,11 @@ public class Launcher {
 
         app.post("/playlist", pc.addNewPlaylistHandler);
 
+        app.delete("/playlist/{id}", pc.deletePlaylistHandler);
+
         app.post("/auth", ac.loginHandler);
+
+        app.get("/playlist/{playlist_id}/songs", sc.getSongsFromPlaylistHandler);
         }
 
 
