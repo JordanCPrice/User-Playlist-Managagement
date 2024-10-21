@@ -65,7 +65,6 @@ public class Launcher {
         app.get("/playlist/{playlist_id}/songs", sc.getSongsFromPlaylistHandler);
         }
 
-
     // Method to check session and handle unauthorized access
     private static void checkSession(Context ctx) {
         if (AuthController.ses == null) {
